@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Target, HeartHandshake, Lightbulb } from "lucide-react";
+import { Target, HeartHandshake, Lightbulb, Heart, ShieldCheck, MapPin, Sparkles, CheckCircle2, Zap, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -10,20 +10,6 @@ export const Route = createFileRoute("/about")({
   }),
   component: AboutPage,
 });
-
-const team = [
-  { n: "Aarav Mehta", r: "Co-founder & CEO", b: "Ex-Swiggy. 8 years scaling hyperlocal ops." },
-  { n: "Sneha Iyer", r: "Co-founder & CTO", b: "ML at Flipkart. IIT Bombay." },
-  { n: "Rohan Das", r: "Head of Trust & Safety", b: "Ex-Uber India. Built rider verification." },
-  { n: "Maya Khurana", r: "Head of Product", b: "Designer-turned-PM. Ex-Razorpay." },
-];
-
-const timeline = [
-  { y: "2023", t: "QuickRozgar founded in Mumbai" },
-  { y: "2024", t: "Launched in 6 cities · 50k workers onboarded" },
-  { y: "2025", t: "Series A · Voice-first AI launched" },
-  { y: "2026", t: "240k+ verified workers across 24 cities" },
-];
 
 function AboutPage() {
   return (
@@ -40,13 +26,13 @@ function AboutPage() {
       </div>
 
       {/* Pillars */}
-      <div className="mt-16 grid gap-5 md:grid-cols-3">
+      <div className="mt-16 grid gap-5 md:grid-cols-3 border-b border-border pb-24">
         {[
           { i: Target, t: "The problem", d: "Local hiring still happens through WhatsApp groups, posters, and word-of-mouth. Slow, opaque, exploitative." },
           { i: HeartHandshake, t: "Why it's underserved", d: "Workers without resumes or English fluency are invisible to existing platforms. Businesses can't trust who shows up." },
           { i: Lightbulb, t: "How AI helps", d: "Voice-first listings, skill inference, and live matching surface the right worker in minutes — without paperwork." },
         ].map((p) => (
-          <div key={p.t} className="rounded-2xl border border-border bg-surface p-6 shadow-soft">
+          <div key={p.t} className="rounded-2xl border border-border bg-surface p-6 shadow-soft transition-transform hover:scale-[1.02]">
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-soft text-primary">
               <p.i className="h-5 w-5" />
             </span>
@@ -55,42 +41,82 @@ function AboutPage() {
           </div>
         ))}
       </div>
-
-      {/* Team */}
-      <div className="mt-24">
-        <div className="flex items-end justify-between">
-          <h2 className="text-3xl font-bold text-secondary md:text-4xl">The team</h2>
-          <span className="text-sm text-muted-foreground">Mumbai · Bengaluru · Remote</span>
-        </div>
-        <div className="mt-8 grid gap-4 md:grid-cols-4">
-          {team.map((m) => (
-            <div key={m.n} className="rounded-2xl border border-border bg-surface p-5 shadow-soft">
-              <div className="grid h-12 w-12 place-items-center rounded-full bg-secondary text-base font-semibold text-secondary-foreground">
-                {m.n.split(" ").map((x) => x[0]).join("")}
+      <div className="mt-32">
+        <h2 className="text-3xl font-bold text-secondary md:text-4xl text-center">Our Core Principles</h2>
+        <div className="mt-12 grid gap-8 md:grid-cols-3">
+          {[
+            { 
+              t: "Dignity First", 
+              d: "We believe every worker deserves respect, clear terms, and timely payments. No hidden fees, no exploitation.",
+              i: Heart
+            },
+            { 
+              t: "Radical Transparency", 
+              d: "Trust is built on data. Verified ratings, real-time tracking, and clear wage breakdowns for every shift.",
+              i: ShieldCheck
+            },
+            { 
+              t: "Hyperlocal Strength", 
+              d: "Strong communities are built by people working near home. We prioritize matches within walking distance.",
+              i: MapPin
+            }
+          ].map((p) => (
+            <div key={p.t} className="text-center p-6">
+              <div className="mx-auto h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+                <p.i className="h-8 w-8 text-primary" />
               </div>
-              <div className="mt-4 text-base font-semibold text-secondary">{m.n}</div>
-              <div className="text-xs font-medium text-primary">{m.r}</div>
-              <p className="mt-2 text-sm text-muted-foreground">{m.b}</p>
+              <h3 className="text-xl font-bold text-secondary">{p.t}</h3>
+              <p className="mt-3 text-muted-foreground leading-relaxed">{p.d}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Timeline */}
-      <div className="mt-24 grid gap-12 md:grid-cols-[280px_1fr]">
-        <div>
-          <h2 className="text-3xl font-bold text-secondary md:text-4xl">Our journey</h2>
-          <p className="mt-3 text-muted-foreground">Three years, one mission, growing fast.</p>
+      {/* Built for the Next Billion */}
+      <div className="mt-32 rounded-[2.5rem] bg-secondary p-10 md:p-20 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+          <Sparkles className="h-64 w-64" />
         </div>
-        <ol className="relative space-y-8 border-l border-border pl-6">
-          {timeline.map((t) => (
-            <li key={t.y} className="relative">
-              <span className="absolute -left-[31px] top-1.5 h-3 w-3 rounded-full border-2 border-background bg-primary" />
-              <div className="text-xs font-semibold uppercase tracking-widest text-primary">{t.y}</div>
-              <div className="mt-1 text-base text-secondary">{t.t}</div>
-            </li>
-          ))}
-        </ol>
+        <div className="relative z-10 grid gap-12 lg:grid-cols-2 items-center">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-widest text-primary">The Gemini Revolution</span>
+            <h2 className="mt-4 text-4xl font-bold md:text-5xl leading-[1.1]">Built for the <span className="text-violet-400">Next Billion.</span></h2>
+            <p className="mt-6 text-lg text-white/70 leading-relaxed">
+              Most gig workers in India don't have a PDF resume or a LinkedIn profile. We use Gemini AI to infer skills from voice, work history, and local reliability scores.
+            </p>
+            <div className="mt-8 space-y-4">
+              {[
+                "Voice-to-listing parsing for shop owners",
+                "Skill inference for workers without resumes",
+                "Real-time hyper-local matching engine",
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-3 text-sm font-medium">
+                  <CheckCircle2 className="h-5 w-5 text-primary" /> {item}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-glow backdrop-blur">
+            <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <Zap className="h-5 w-5 text-warning" /> AI Matching in Action
+            </h4>
+            <div className="space-y-3 opacity-80">
+              <div className="p-3 rounded-xl bg-white/10 text-xs font-medium border border-white/5">"I need a delivery boy near Indiranagar"</div>
+              <ArrowRight className="h-4 w-4 mx-auto text-white/40" />
+              <div className="p-3 rounded-xl bg-primary/20 text-xs font-bold border border-primary/20 text-primary">AI matched Rahul S. (0.4km away)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sign-off */}
+      <div className="mt-32 mb-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
+        <p className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-muted/50 text-sm font-medium text-secondary">
+          Crafted with <Heart className="h-4 w-4 text-rose-500 fill-rose-500 animate-pulse" /> in Bengaluru
+        </p>
+        <p className="mt-4 text-xs text-muted-foreground tracking-[0.3em] uppercase">
+          Empowering India's Local Economy
+        </p>
       </div>
     </section>
   );

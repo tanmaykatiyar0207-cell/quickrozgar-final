@@ -10,7 +10,10 @@ import {
   Briefcase,
   Mic,
   CheckCircle2,
+  IndianRupee,
 } from "lucide-react";
+
+import logo from "@/assets/quickrozgar-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -31,9 +34,9 @@ function HomePage() {
         <div className="absolute inset-0 grid-bg opacity-40" />
         <div className="container-page relative pb-20 pt-20 md:pb-28 md:pt-28">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Now live in 24 Indian cities
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-bold text-primary shadow-sm backdrop-blur animate-in fade-in slide-in-from-top-2 duration-700">
+              <Sparkles className="h-3 w-3" />
+              AI-Powered Hyperlocal Matching
             </span>
             <h1 className="mt-6 text-balance text-5xl font-bold leading-[1.05] text-secondary md:text-6xl lg:text-7xl">
               Hire nearby workers, <span className="text-gradient-brand">instantly.</span>
@@ -62,37 +65,50 @@ function HomePage() {
           </div>
 
           {/* Hero card preview */}
-          <div className="mx-auto mt-16 max-w-4xl">
-            <div className="rounded-3xl border border-border bg-surface p-2 shadow-elevated">
-              <div className="rounded-2xl bg-secondary p-6 md:p-8">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs text-white/60">
-                    <span className="h-2 w-2 rounded-full bg-success" />
-                    Live matches near Bandra West
-                  </div>
-                  <span className="text-xs text-white/60">Updated just now</span>
+          <div className="mx-auto mt-20 max-w-5xl">
+            <div className="rounded-[2.5rem] border border-border bg-surface p-3 shadow-elevated">
+              <div className="rounded-[2rem] bg-secondary p-8 md:p-12 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+                  <Zap className="h-64 w-64 text-primary" />
                 </div>
-                <div className="mt-6 grid gap-3 md:grid-cols-3">
-                  {[
-                    { name: "Rahul S.", role: "Delivery Partner", dist: "0.4 km", score: 96 },
-                    { name: "Priya K.", role: "Cleaning Pro", dist: "0.7 km", score: 92 },
-                    { name: "Anil M.", role: "Electrician", dist: "1.1 km", score: 89 },
-                  ].map((w) => (
-                    <div key={w.name} className="rounded-xl bg-white/5 p-4 ring-1 ring-white/10">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-sm font-semibold text-white">{w.name}</div>
-                          <div className="text-xs text-white/60">{w.role}</div>
-                        </div>
-                        <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[11px] font-semibold text-primary">
-                          {w.score}% match
-                        </span>
-                      </div>
-                      <div className="mt-3 flex items-center gap-1 text-xs text-white/60">
-                        <MapPin className="h-3 w-3" /> {w.dist} away
-                      </div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-sm font-semibold text-white/70 uppercase tracking-widest">
+                      <span className="relative flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
+                      </span>
+                      Live matches near Bandra West
                     </div>
-                  ))}
+                    <span className="text-xs font-medium text-white/40">Updated just now</span>
+                  </div>
+                  <div className="mt-10 grid gap-6 md:grid-cols-3">
+                    {[
+                      { name: "Rahul S.", role: "Delivery Partner", dist: "0.4 km", score: 96, color: "text-blue-400" },
+                      { name: "Priya K.", role: "Cleaning Pro", dist: "0.7 km", score: 92, color: "text-emerald-400" },
+                      { name: "Anil M.", role: "Electrician", dist: "1.1 km", score: 89, color: "text-amber-400" },
+                    ].map((w) => (
+                      <div key={w.name} className="group rounded-[1.5rem] bg-white/5 p-6 ring-1 ring-white/10 transition-all hover:bg-white/10 hover:scale-[1.03]">
+                        <div className="flex flex-col gap-4">
+                          <div className="flex items-start justify-between">
+                            <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center text-xl font-bold text-white">
+                              {w.name[0]}
+                            </div>
+                            <span className="rounded-full bg-primary/20 px-3 py-1 text-xs font-bold text-primary">
+                              {w.score}% match
+                            </span>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-white">{w.name}</div>
+                            <div className={`text-sm font-semibold ${w.color}`}>{w.role}</div>
+                          </div>
+                          <div className="mt-2 flex items-center gap-2 text-sm text-white/50">
+                            <MapPin className="h-4 w-4" /> {w.dist} away
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -100,23 +116,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* LOGOS */}
-      <section className="border-y border-border bg-surface/60">
-        <div className="container-page py-10">
-          <p className="text-center text-xs uppercase tracking-widest text-muted-foreground">
-            Trusted by 12,000+ businesses across India
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-4 opacity-70">
-            {["Zypp", "Urban Co", "Chai Point", "Blinkit", "Lenskart", "Country Delight"].map(
-              (n) => (
-                <span key={n} className="text-sm font-semibold tracking-tight text-secondary/70">
-                  {n}
-                </span>
-              ),
-            )}
-          </div>
-        </div>
-      </section>
+
 
       {/* FEATURES */}
       <section className="container-page py-24">
@@ -182,21 +182,28 @@ function HomePage() {
         </div>
       </section>
 
-      {/* STATS */}
-      <section className="border-y border-border bg-secondary text-white">
-        <div className="container-page py-16">
-          <div className="grid gap-10 md:grid-cols-4">
-            {[
-              { v: "240k+", l: "Verified workers" },
-              { v: "12k+", l: "Active businesses" },
-              { v: "8 min", l: "Average time to hire" },
-              { v: "4.8★", l: "Average worker rating" },
-            ].map((s) => (
-              <div key={s.l}>
-                <div className="text-4xl font-bold tracking-tight md:text-5xl">{s.v}</div>
-                <div className="mt-2 text-sm text-white/60">{s.l}</div>
-              </div>
-            ))}
+      {/* STATS BADGE */}
+      <section className="container-page py-12">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-secondary text-white shadow-glow">
+          <div className="absolute top-0 right-0 p-20 opacity-10 pointer-events-none">
+            <Sparkles className="h-64 w-64" />
+          </div>
+          <div className="relative z-10 px-8 py-16 md:px-12">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+              {[
+                { v: "50k+", l: "AI Smart Matches", i: Sparkles, c: "text-violet-400" },
+                { v: "2km", l: "Hyperlocal Radius", i: MapPin, c: "text-primary" },
+                { v: "8 min", l: "Time to Hire", i: Zap, c: "text-warning" },
+                { v: "4.8★", l: "Reliability Score", i: Star, c: "text-yellow-400" },
+                { v: "95%", l: "Match Accuracy", i: CheckCircle2, c: "text-emerald-400" },
+              ].map((s) => (
+                <div key={s.l} className="group relative rounded-2xl border border-white/5 bg-white/5 p-5 transition-all hover:bg-white/10">
+                  <s.i className={`h-6 w-6 ${s.c} mb-3 transition-transform group-hover:scale-110`} />
+                  <div className="text-3xl font-bold tracking-tight">{s.v}</div>
+                  <div className="mt-1 text-xs text-white/50 font-semibold uppercase tracking-wider">{s.l}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -230,6 +237,46 @@ function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* IMPACT SECTION */}
+      <section className="bg-muted/30 border-y border-border overflow-hidden relative">
+        <div className="container-page py-24 relative z-10">
+          <div className="flex flex-col lg:flex-row gap-16 items-center">
+            <div className="max-w-xl">
+              <span className="inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-xs font-bold text-success mb-4">
+                <ShieldCheck className="h-3.5 w-3.5" /> SDG Impact Tracked
+              </span>
+              <h2 className="text-4xl font-bold text-secondary md:text-5xl tracking-tight leading-[1.1]">
+                A measurable commitment.
+              </h2>
+              <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
+                We publish quarterly impact reports tracking earnings lifted, hours formalized, and emissions saved via hyperlocal matching.
+              </p>
+              <div className="mt-8 flex gap-6">
+                <Link to="/sdg" className="text-sm font-bold text-primary flex items-center gap-1.5 hover:underline">
+                  View full report <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+            
+            <div className="grid gap-4 sm:grid-cols-3 w-full">
+              {[
+                { v: "₹84 Cr", l: "Wages Disbursed", i: IndianRupee, c: "text-emerald-600", bg: "bg-emerald-50" },
+                { v: "1.2M", l: "Verified Shifts", i: CheckCircle2, c: "text-blue-600", bg: "bg-blue-50" },
+                { v: "3.8M kg", l: "CO₂ Saved", i: Zap, c: "text-primary", bg: "bg-primary/5" },
+              ].map((m) => (
+                <div key={m.l} className="rounded-3xl border border-border bg-surface p-8 shadow-soft flex flex-col items-center text-center group hover:scale-[1.02] transition-transform">
+                  <div className={`h-14 w-14 rounded-2xl ${m.bg} flex items-center justify-center mb-6`}>
+                    <m.i className={`h-7 w-7 ${m.c}`} />
+                  </div>
+                  <div className="text-3xl font-bold text-secondary tracking-tight">{m.v}</div>
+                  <div className="mt-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">{m.l}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

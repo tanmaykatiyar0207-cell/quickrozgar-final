@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Sprout, Briefcase, Cpu, Scale, Building2 } from "lucide-react";
+import { Sprout, Briefcase, Cpu, Scale, Building2, ShieldCheck, IndianRupee, CheckCircle2, Zap } from "lucide-react";
 
 export const Route = createFileRoute("/sdg")({
   head: () => ({
@@ -100,22 +100,28 @@ function SDGPage() {
         ))}
       </div>
 
-      <div className="mt-16 rounded-3xl border border-border bg-secondary p-10 text-center text-white md:p-14">
-        <h3 className="text-3xl font-semibold md:text-4xl">A measurable commitment.</h3>
-        <p className="mx-auto mt-3 max-w-xl text-white/70">
-          We publish quarterly impact reports tracking earnings lifted, hours formalized, and emissions saved.
-        </p>
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
-          {[
-            { v: "₹84 Cr", l: "Wages disbursed" },
-            { v: "1.2M", l: "Verified shifts completed" },
-            { v: "3.8M kg", l: "CO₂ saved via local matching" },
-          ].map((x) => (
-            <div key={x.l}>
-              <div className="text-4xl font-bold tracking-tight">{x.v}</div>
-              <div className="mt-1 text-sm text-white/60">{x.l}</div>
-            </div>
-          ))}
+      <div className="mt-16 overflow-hidden rounded-[2.5rem] bg-secondary p-10 text-center text-white md:p-16 shadow-glow relative">
+        <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+          <ShieldCheck className="h-48 w-48" />
+        </div>
+        <div className="relative z-10">
+          <h3 className="text-4xl font-bold md:text-5xl tracking-tight">A measurable commitment.</h3>
+          <p className="mx-auto mt-4 max-w-xl text-lg text-white/60">
+            We publish quarterly impact reports tracking earnings lifted, hours formalized, and emissions saved.
+          </p>
+          <div className="mt-12 grid gap-6 sm:grid-cols-3">
+            {[
+              { v: "₹84 Cr", l: "Wages disbursed", i: IndianRupee, c: "text-emerald-400" },
+              { v: "1.2M", l: "Verified shifts completed", i: CheckCircle2, c: "text-blue-400" },
+              { v: "3.8M kg", l: "CO₂ saved via local matching", i: Zap, c: "text-primary" },
+            ].map((x) => (
+              <div key={x.l} className="rounded-2xl border border-white/10 bg-white/5 p-8 flex flex-col items-center">
+                <x.i className={`h-8 w-8 ${x.c} mb-4`} />
+                <div className="text-4xl font-bold tracking-tight">{x.v}</div>
+                <div className="mt-2 text-sm font-semibold text-white/50 uppercase tracking-wider">{x.l}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

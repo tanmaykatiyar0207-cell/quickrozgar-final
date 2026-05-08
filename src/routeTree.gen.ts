@@ -9,7 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WorkerDashboardRouteImport } from './routes/worker-dashboard'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SdgRouteImport } from './routes/sdg'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -17,9 +21,29 @@ import { Route as AiMatchingRouteImport } from './routes/ai-matching'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WorkerDashboardRoute = WorkerDashboardRouteImport.update({
+  id: '/worker-dashboard',
+  path: '/worker-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SdgRoute = SdgRouteImport.update({
   id: '/sdg',
   path: '/sdg',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoverRoute = DiscoverRouteImport.update({
@@ -60,7 +84,11 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
+  '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/sdg': typeof SdgRoute
+  '/terms': typeof TermsRoute
+  '/worker-dashboard': typeof WorkerDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -69,7 +97,11 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
+  '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/sdg': typeof SdgRoute
+  '/terms': typeof TermsRoute
+  '/worker-dashboard': typeof WorkerDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -79,7 +111,11 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
+  '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/sdg': typeof SdgRoute
+  '/terms': typeof TermsRoute
+  '/worker-dashboard': typeof WorkerDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -90,7 +126,11 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/discover'
+    | '/login'
+    | '/privacy'
     | '/sdg'
+    | '/terms'
+    | '/worker-dashboard'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -99,7 +139,11 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/discover'
+    | '/login'
+    | '/privacy'
     | '/sdg'
+    | '/terms'
+    | '/worker-dashboard'
   id:
     | '__root__'
     | '/'
@@ -108,7 +152,11 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/discover'
+    | '/login'
+    | '/privacy'
     | '/sdg'
+    | '/terms'
+    | '/worker-dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -118,16 +166,48 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   DiscoverRoute: typeof DiscoverRoute
+  LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
   SdgRoute: typeof SdgRoute
+  TermsRoute: typeof TermsRoute
+  WorkerDashboardRoute: typeof WorkerDashboardRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/worker-dashboard': {
+      id: '/worker-dashboard'
+      path: '/worker-dashboard'
+      fullPath: '/worker-dashboard'
+      preLoaderRoute: typeof WorkerDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sdg': {
       id: '/sdg'
       path: '/sdg'
       fullPath: '/sdg'
       preLoaderRoute: typeof SdgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discover': {
@@ -182,8 +262,22 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   DiscoverRoute: DiscoverRoute,
+  LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
   SdgRoute: SdgRoute,
+  TermsRoute: TermsRoute,
+  WorkerDashboardRoute: WorkerDashboardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

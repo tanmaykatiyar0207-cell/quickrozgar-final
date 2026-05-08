@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Twitter, Linkedin, Github } from "lucide-react";
+import { Twitter, Linkedin, Github, Heart } from "lucide-react";
 import logo from "@/assets/quickrozgar-logo.png";
 
 export function SiteFooter() {
@@ -38,17 +38,22 @@ export function SiteFooter() {
           <FooterCol
             title="Resources"
             items={[
-              { to: "/contact", label: "Help Center" },
-              { to: "/contact", label: "Privacy" },
-              { to: "/contact", label: "Terms" },
+              { to: "/about", label: "Documentation" },
+              { to: "/privacy", label: "Privacy" },
+              { to: "/terms", label: "Terms" },
             ]}
           />
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-border pt-6 md:flex-row md:items-center">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} QuickRozgar Technologies. All rights reserved.
-          </p>
+        <div className="mt-12 flex flex-col items-start justify-between gap-6 border-t border-border pt-8 md:flex-row md:items-center">
+          <div className="flex flex-col gap-1">
+            <p className="text-xs text-muted-foreground">
+              © {new Date().getFullYear()} QuickRozgar Technologies. All rights reserved.
+            </p>
+            <p className="text-[11px] font-medium text-secondary/60 flex items-center gap-1">
+              Crafted with <Heart className="h-3 w-3 text-rose-500 fill-rose-500 animate-pulse" /> in Bengaluru
+            </p>
+          </div>
           <div className="flex items-center gap-3 text-muted-foreground">
             <a href="#" aria-label="Twitter" className="hover:text-secondary"><Twitter className="h-4 w-4" /></a>
             <a href="#" aria-label="LinkedIn" className="hover:text-secondary"><Linkedin className="h-4 w-4" /></a>
