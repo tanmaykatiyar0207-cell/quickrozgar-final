@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles, Twitter, Linkedin, Github } from "lucide-react";
+import { Twitter, Linkedin, Github } from "lucide-react";
+import logo from "@/assets/quickrozgar-logo.png";
 
 export function SiteFooter() {
   return (
