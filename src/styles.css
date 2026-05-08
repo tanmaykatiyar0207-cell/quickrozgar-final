@@ -137,11 +137,27 @@
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-card { box-shadow: var(--shadow-card); }
   .shadow-elevated { box-shadow: var(--shadow-elevated); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
   .grid-bg {
     background-image:
       linear-gradient(to right, oklch(0 0 0 / 0.04) 1px, transparent 1px),
       linear-gradient(to bottom, oklch(0 0 0 / 0.04) 1px, transparent 1px);
     background-size: 48px 48px;
     mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
+  }
+  .hero-aura {
+    background:
+      radial-gradient(60% 50% at 15% 20%, oklch(0.687 0.165 51 / 0.18), transparent 60%),
+      radial-gradient(50% 45% at 85% 15%, oklch(0.65 0.18 290 / 0.14), transparent 60%),
+      radial-gradient(50% 50% at 50% 100%, oklch(0.72 0.12 195 / 0.16), transparent 60%);
+  }
+  .text-gradient-brand {
+    background: linear-gradient(90deg, oklch(0.687 0.165 51), oklch(0.65 0.18 290));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .bg-gradient-brand {
+    background-image: linear-gradient(135deg, oklch(0.687 0.165 51), oklch(0.62 0.2 25));
   }
 }
