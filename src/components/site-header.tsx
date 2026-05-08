@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import logo from "@/assets/quickrozgar-logo.png";
 
 const links = [
   { to: "/", label: "Home" },
@@ -19,12 +20,10 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="container-page flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-secondary text-primary">
-            <Sparkles className="h-4 w-4" />
-          </span>
+        <Link to="/" className="flex items-center gap-2.5">
+          <img src={logo} alt="QuickRozgar" className="h-9 w-9 rounded-lg object-contain" />
           <span className="text-[17px] font-semibold tracking-tight text-secondary">
-            QuickRozgar
+            Quick<span className="text-primary">Rozgar</span>
           </span>
         </Link>
 

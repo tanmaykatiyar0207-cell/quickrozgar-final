@@ -27,15 +27,16 @@ function HomePage() {
     <>
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-60" />
+        <div className="absolute inset-0 hero-aura" />
+        <div className="absolute inset-0 grid-bg opacity-40" />
         <div className="container-page relative pb-20 pt-20 md:pb-28 md:pt-28">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted-foreground shadow-soft">
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               Now live in 24 Indian cities
             </span>
             <h1 className="mt-6 text-balance text-5xl font-bold leading-[1.05] text-secondary md:text-6xl lg:text-7xl">
-              Hire nearby workers, <span className="text-primary">instantly.</span>
+              Hire nearby workers, <span className="text-gradient-brand">instantly.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
               QuickRozgar matches your job to verified gig workers within walking distance — using AI that understands skills, location, and availability in real time.
@@ -43,7 +44,7 @@ function HomePage() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link
                 to="/dashboard"
-                className="group inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-soft transition-transform hover:-translate-y-0.5"
+                className="group inline-flex items-center gap-2 rounded-full bg-gradient-brand px-5 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:-translate-y-0.5"
               >
                 Post a Job
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -134,38 +135,44 @@ function HomePage() {
               icon: Zap,
               title: "Hire in under 10 minutes",
               body: "Post a role and get qualified candidates ready to work — same day, on your block.",
+              tone: "bg-[oklch(0.965_0.045_80)] text-primary",
             },
             {
               icon: Sparkles,
               title: "AI-matched candidates",
               body: "Our matching engine ranks workers by skill, distance, reliability, and availability.",
+              tone: "bg-[oklch(0.95_0.04_290)] text-violet",
             },
             {
               icon: ShieldCheck,
               title: "Verified & insured",
               body: "ID-verified workers with ratings, work history, and built-in safety tools.",
+              tone: "bg-[oklch(0.95_0.04_160)] text-emerald",
             },
             {
               icon: Mic,
               title: "Voice-to-job posting",
               body: "Describe the role in your own language. Our AI structures it into a complete listing.",
+              tone: "bg-[oklch(0.95_0.04_15)] text-rose",
             },
             {
               icon: MapPin,
               title: "Hyperlocal radius",
               body: "Match within a 1–5 km radius for faster onboarding and fewer no-shows.",
+              tone: "bg-[oklch(0.94_0.04_195)] text-teal",
             },
             {
               icon: Briefcase,
               title: "Built for shifts & gigs",
               body: "From a 2-hour shift to a recurring gig — flexible terms that fit your business.",
+              tone: "bg-[oklch(0.965_0.045_80)] text-primary",
             },
           ].map((f) => (
             <div
               key={f.title}
-              className="rounded-2xl border border-border bg-surface p-6 shadow-soft transition-shadow hover:shadow-card"
+              className="rounded-2xl border border-border bg-surface p-6 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-card"
             >
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-soft text-primary">
+              <span className={`grid h-11 w-11 place-items-center rounded-xl ${f.tone}`}>
                 <f.icon className="h-5 w-5" />
               </span>
               <h3 className="mt-5 text-lg font-semibold text-secondary">{f.title}</h3>
