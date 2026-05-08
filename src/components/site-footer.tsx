@@ -8,11 +8,11 @@ export function SiteFooter() {
       <div className="container-page py-16">
         <div className="grid gap-12 md:grid-cols-4">
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2">
-              <span className="grid h-8 w-8 place-items-center rounded-lg bg-secondary text-primary">
-                <Sparkles className="h-4 w-4" />
+            <div className="flex items-center gap-2.5">
+              <img src={logo} alt="QuickRozgar" className="h-9 w-9 rounded-lg object-contain" />
+              <span className="text-base font-semibold text-secondary">
+                Quick<span className="text-primary">Rozgar</span>
               </span>
-              <span className="text-base font-semibold text-secondary">QuickRozgar</span>
             </div>
             <p className="mt-4 max-w-xs text-sm text-muted-foreground">
               AI-powered hyperlocal hiring. Connecting businesses with nearby workers in minutes.
