@@ -142,8 +142,11 @@ function DashboardPage() {
               items: workers
             });
             const merged = insights.map((insightObj: any) => {
-              const fullItem = workers.find(i => i.id === insightObj.id);
-              return fullItem ? { ...fullItem, insight: insightObj.insight } : null;
+              if (!insightObj || !insightObj.id) return null;
+              const targetId = String(insightObj.id).replace(/-/g, '').trim().toLowerCase();
+              const fullItem = workers.find(i => String(i.id).replace(/-/g, '').trim().toLowerCase() === targetId);
+              if (!fullItem) return null;
+              return { ...fullItem, insight: insightObj.insight };
             }).filter(Boolean);
             setCandidateMatches(merged.slice(0, 3));
           }

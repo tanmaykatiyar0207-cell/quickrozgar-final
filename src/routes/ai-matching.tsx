@@ -69,6 +69,16 @@ function AIMatchingPage() {
         items = openJobs;
       }
 
+      if (!profile) {
+        toast.error("Profile not found. Please complete your profile first.");
+        return;
+      }
+      
+      if (!items || items.length === 0) {
+        toast.error("No data available to match against. Please check back later.");
+        return;
+      }
+
       const insights = await getAIMatches({
         role: role!,
         profile,
@@ -79,8 +89,8 @@ function AIMatchingPage() {
       const merged = insights.map((insightObj: any) => {
         if (!insightObj || !insightObj.id) return null;
         
-        const targetId = String(insightObj.id).trim().toLowerCase();
-        const fullItem = items.find(i => String(i.id).trim().toLowerCase() === targetId);
+        const targetId = String(insightObj.id).replace(/-/g, '').trim().toLowerCase();
+        const fullItem = items.find(i => String(i.id).replace(/-/g, '').trim().toLowerCase() === targetId);
         
         if (!fullItem) {
           console.warn(`[AI Match] Could not find full item for ID: ${insightObj.id}`);

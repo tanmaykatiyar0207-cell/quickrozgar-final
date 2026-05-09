@@ -53,11 +53,20 @@ export const extractJobDetails = createServerFn({ method: "POST" })
 
 export const getAIMatches = createServerFn({ method: "POST" })
   .handler(async (args: any): Promise<any[]> => {
+    console.log("[getAIMatches] Received args:", JSON.stringify(args));
     try {
-      const data = args.data || {};
+      const data = args.data || args || {};
       const { role, profile, items = [] } = data;
       
-      if (!profile || !items.length) return [];
+      if (!profile) {
+        console.warn("[getAIMatches] No profile provided");
+        return [];
+      }
+      
+      if (!items || items.length === 0) {
+        console.warn("[getAIMatches] No items available to match against");
+        return [];
+      }
 
       let prompt = "";
       if (role === 'employer') {
@@ -68,7 +77,7 @@ export const getAIMatches = createServerFn({ method: "POST" })
         Task: Pick the top 5 candidates who best fit this job based on skills and location proximity.
         For each candidate, provide a 1-2 sentence "insight" explaining why they are a good match.
         
-        CRITICAL: Use the EXACT "ID" provided for each candidate.
+        CRITICAL: Use the EXACT "ID" provided for each candidate. Do NOT change casing or remove dashes.
         OUTPUT: Return ONLY a JSON array of objects following this schema: [{"id": "string", "insight": "string"}]. Do NOT wrap this in a root object.`;
       } else {
         prompt = `You are the AI matching engine for QuickRozgar, a hyperlocal hiring platform.
@@ -78,7 +87,7 @@ export const getAIMatches = createServerFn({ method: "POST" })
         Task: Pick the top 5 jobs that best fit this worker's profile and location.
         For each job, provide a 1-2 sentence "insight" explaining the fit.
         
-        CRITICAL: Use the EXACT "ID" provided for each job.
+        CRITICAL: Use the EXACT "ID" provided for each job. Do NOT change casing or remove dashes.
         OUTPUT: Return ONLY a JSON array of objects following this schema: [{"id": "string", "insight": "string"}]. Do NOT wrap this in a root object.`;
       }
 
@@ -123,8 +132,8 @@ export const getWorkerSmartMatches = createServerFn({ method: "POST" })
       return aiMatches
         .map((m: any) => {
           if (!m || !m.id) return null;
-          const targetId = String(m.id).trim().toLowerCase();
-          const job = jobs.find((j: any) => String(j.id).trim().toLowerCase() === targetId);
+          const targetId = String(m.id).replace(/-/g, '').trim().toLowerCase();
+          const job = jobs.find((j: any) => String(j.id).replace(/-/g, '').trim().toLowerCase() === targetId);
           if (!job) return null;
           return {
             ...job,
