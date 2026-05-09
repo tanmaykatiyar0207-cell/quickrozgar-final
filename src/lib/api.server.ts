@@ -99,8 +99,8 @@ export const getAIMatches = createServerFn({ method: "POST" })
       return results;
     } catch (error) {
       console.error("AI Matching failed:", error);
-      const fallbackItems = (args.data?.items) || [];
-      return fallbackItems.slice(0, 5).map((item: any) => ({ 
+      // Fallback logic if AI fails - use the items we already have
+      return (items || []).slice(0, 5).map((item: any) => ({ 
         id: item.id, 
         insight: "Strong match based on your profile and local demand. Recommended for immediate review." 
       }));
@@ -110,9 +110,12 @@ export const getAIMatches = createServerFn({ method: "POST" })
 export const getWorkerSmartMatches = createServerFn({ method: "POST" })
   .handler(async (args: any): Promise<any[]> => {
     try {
-      const data = args.data || {};
+      const data = args.data || args || {};
       const { workerProfile, jobs = [] } = data;
-      if (!workerProfile || !jobs.length) return [];
+      if (!workerProfile || !jobs.length) {
+        console.warn("[getWorkerSmartMatches] Missing profile or jobs");
+        return [];
+      }
       
       const prompt = `You are an AI career coach for QuickRozgar.
       Worker Profile: Name: ${workerProfile.full_name}, Skills: ${workerProfile.skills}, Location: ${workerProfile.location}.

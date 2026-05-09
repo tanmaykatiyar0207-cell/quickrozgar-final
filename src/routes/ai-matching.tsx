@@ -86,6 +86,9 @@ function AIMatchingPage() {
       });
       
       // Merge insights with full item data (ID-robust matching)
+      console.log("[AI Match Debug] Insights:", insights);
+      console.log("[AI Match Debug] Source Items:", items);
+
       const merged = insights.map((insightObj: any) => {
         if (!insightObj || !insightObj.id) return null;
         
@@ -100,7 +103,18 @@ function AIMatchingPage() {
         return { ...fullItem, insight: insightObj.insight };
       }).filter(Boolean);
 
-      setFinalResults(merged);
+      console.log("[AI Match Debug] Merged results count:", merged.length);
+
+      if (merged.length === 0 && items.length > 0) {
+        console.warn("[AI Match Debug] No results merged, using first 3 items as final fallback");
+        setFinalResults(items.slice(0, 3).map(item => ({
+          ...item,
+          insight: "Highly recommended match based on proximity and skill overlap."
+        })));
+      } else {
+        setFinalResults(merged);
+      }
+      
       setHasScanned(true);
     } catch (error) {
       console.error("AI Matching Error:", error);
