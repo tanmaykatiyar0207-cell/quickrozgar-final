@@ -69,7 +69,7 @@ export const getAIMatches = createServerFn({ method: "POST" })
         For each candidate, provide a 1-2 sentence "insight" explaining why they are a good match.
         
         CRITICAL: Use the EXACT "ID" provided for each candidate.
-        OUTPUT: Return ONLY a JSON array of objects: [{"id": "exact_id_from_input", "insight": "your_explanation"}].`;
+        OUTPUT: Return ONLY a JSON array of objects: [{"id": "exact_id_from_input", "insight": "your_explanation"}]. Do NOT wrap this in a root object like {"results": [...]}.`;
       } else {
         prompt = `You are the AI matching engine for QuickRozgar, a hyperlocal hiring platform.
         Target Worker: ${JSON.stringify(profile)}
@@ -79,7 +79,7 @@ export const getAIMatches = createServerFn({ method: "POST" })
         For each job, provide a 1-2 sentence "insight" explaining the fit.
         
         CRITICAL: Use the EXACT "ID" provided for each job.
-        OUTPUT: Return ONLY a JSON array of objects: [{"id": "exact_id_from_input", "insight": "your_explanation"}].`;
+        OUTPUT: Return ONLY a JSON array of objects: [{"id": "exact_id_from_input", "insight": "your_explanation"}]. Do NOT wrap this in a root object like {"matches": [...]}.`;
       }
 
       const results = await generateGeminiJSON(prompt);

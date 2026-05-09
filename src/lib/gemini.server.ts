@@ -19,14 +19,35 @@ export async function generateGeminiJSON(prompt: string, modelName: string = "ge
     throw new Error("GEMINI_API_KEY is not set in environment variables");
   }
 
-  const text = await generateGeminiContent(prompt + "\n\nIMPORTANT: Return EXACTLY a JSON object or array. No markdown, no triple backticks.", modelName);
+  const model = genAI.getGenerativeModel({ 
+    model: modelName,
+    generationConfig: { responseMimeType: "application/json" }
+  });
   
-  try {
-    // Clean potential markdown artifacts
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  const text = response.text();
+  
+    // Clean potential markdown artifacts (though native JSON mode should handle this)
     const cleanText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-    return JSON.parse(cleanText);
+    const parsed = JSON.parse(cleanText);
+    
+    // If Gemini wrapped the result in a property, try to find it
+    if (!Array.isArray(parsed) && typeof parsed === 'object') {
+      const firstKey = Object.keys(parsed)[0];
+      if (Array.isArray(parsed[firstKey])) return parsed[firstKey];
+    }
+    
+    return parsed;
   } catch (error) {
     console.error("Failed to parse Gemini JSON:", text);
+    // If it's not a valid JSON array/object, try to extract anything that looks like JSON
+    try {
+      const match = text.match(/\[[\s\S]*\]|\{[\s\S]*\}/);
+      if (match) return JSON.parse(match[0]);
+    } catch (innerError) {
+      console.error("Secondary parse attempt failed:", innerError);
+    }
     throw new Error("Gemini returned invalid JSON");
   }
 }

@@ -205,6 +205,15 @@ function AIMatchingPage() {
                 </button>
               </div>
             ))
+          ) : hasScanned && finalResults.length === 0 ? (
+            <div className="col-span-full py-24 text-center">
+              <div className="mx-auto w-24 h-24 rounded-full bg-warning/10 flex items-center justify-center mb-6">
+                <BrainCircuit className="h-12 w-12 text-warning" />
+              </div>
+              <h2 className="text-2xl font-bold text-secondary">No exact matches found.</h2>
+              <p className="text-muted-foreground mt-2">Try expanding your search criteria or updating your profile skills.</p>
+              <button onClick={() => setHasScanned(false)} className="mt-6 text-primary font-bold hover:underline">Reset Scan</button>
+            </div>
           ) : (
             <div className="col-span-full py-24 text-center">
               <div className="mx-auto w-24 h-24 rounded-full bg-muted/50 flex items-center justify-center mb-6">
