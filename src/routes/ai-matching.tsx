@@ -75,10 +75,19 @@ function AIMatchingPage() {
         items
       });
       
-      // Merge insights with full item data
+      // Merge insights with full item data (ID-robust matching)
       const merged = insights.map((insightObj: any) => {
-        const fullItem = items.find(i => i.id === insightObj.id);
-        return fullItem ? { ...fullItem, insight: insightObj.insight } : null;
+        if (!insightObj || !insightObj.id) return null;
+        
+        const targetId = String(insightObj.id).trim().toLowerCase();
+        const fullItem = items.find(i => String(i.id).trim().toLowerCase() === targetId);
+        
+        if (!fullItem) {
+          console.warn(`[AI Match] Could not find full item for ID: ${insightObj.id}`);
+          return null;
+        }
+        
+        return { ...fullItem, insight: insightObj.insight };
       }).filter(Boolean);
 
       setFinalResults(merged);

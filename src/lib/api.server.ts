@@ -69,7 +69,7 @@ export const getAIMatches = createServerFn({ method: "POST" })
         For each candidate, provide a 1-2 sentence "insight" explaining why they are a good match.
         
         CRITICAL: Use the EXACT "ID" provided for each candidate.
-        OUTPUT: Return ONLY a JSON array of objects: [{"id": "exact_id_from_input", "insight": "your_explanation"}]. Do NOT wrap this in a root object like {"results": [...]}.`;
+        OUTPUT: Return ONLY a JSON array of objects following this schema: [{"id": "string", "insight": "string"}]. Do NOT wrap this in a root object.`;
       } else {
         prompt = `You are the AI matching engine for QuickRozgar, a hyperlocal hiring platform.
         Target Worker: ${JSON.stringify(profile)}
@@ -79,10 +79,13 @@ export const getAIMatches = createServerFn({ method: "POST" })
         For each job, provide a 1-2 sentence "insight" explaining the fit.
         
         CRITICAL: Use the EXACT "ID" provided for each job.
-        OUTPUT: Return ONLY a JSON array of objects: [{"id": "exact_id_from_input", "insight": "your_explanation"}]. Do NOT wrap this in a root object like {"matches": [...]}.`;
+        OUTPUT: Return ONLY a JSON array of objects following this schema: [{"id": "string", "insight": "string"}]. Do NOT wrap this in a root object.`;
       }
 
+      console.log(`[AI Match] Role: ${role}, Items count: ${items?.length}`);
       const results = await generateGeminiJSON(prompt);
+      console.log(`[AI Match] Gemini returned ${results?.length} results`);
+      
       if (!Array.isArray(results)) throw new Error("Invalid AI response format");
       return results;
     } catch (error) {
@@ -119,7 +122,9 @@ export const getWorkerSmartMatches = createServerFn({ method: "POST" })
 
       return aiMatches
         .map((m: any) => {
-          const job = jobs.find((j: any) => j.id === m.id);
+          if (!m || !m.id) return null;
+          const targetId = String(m.id).trim().toLowerCase();
+          const job = jobs.find((j: any) => String(j.id).trim().toLowerCase() === targetId);
           if (!job) return null;
           return {
             ...job,

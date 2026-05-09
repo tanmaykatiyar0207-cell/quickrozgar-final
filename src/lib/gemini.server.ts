@@ -28,6 +28,7 @@ export async function generateGeminiJSON(prompt: string, modelName: string = "ge
   const response = await result.response;
   const text = response.text();
   
+  try {
     // Clean potential markdown artifacts (though native JSON mode should handle this)
     const cleanText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleanText);
