@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Sparkles, MapPin, Zap, UserPlus, CheckCircle2, ArrowLeft, BrainCircuit } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { getAIMatches } from "@/lib/api.server";
 
 export const Route = createFileRoute("/ai-matching")({
   component: AIMatchingPage,
@@ -23,8 +24,7 @@ function AIMatchingPage() {
   const [openJobs, setOpenJobs] = useState<any[]>([]);
   
   const [invitingId, setInvitingId] = useState<string | null>(null);
-  const [aiInsights, setAiInsights] = useState<string[]>([]);
-  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDZhYFJOc4hNIWOG3sz18mILjWORMVh8lY";
+  const [finalResults, setFinalResults] = useState<any[]>([]);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
@@ -57,47 +57,47 @@ function AIMatchingPage() {
     setHasScanned(false);
     
     try {
-      let prompt = "";
+      let profile: any = null;
+      let items: any[] = [];
+
       if (role === 'employer') {
-        const activeJob = myJobs.find(j => j.id === selectedJob) || myJobs[0];
-        prompt = `You are the AI matching engine for QuickRozgar.
-        Job Detail: Role: ${activeJob.title}, Company: ${activeJob.company}, Location: ${activeJob.location}.
-        Candidates: ${workers.map((w, i) => `${i}: ${w.full_name}, Skills: ${w.skills}, Location: ${w.location}`).join('\n')}
-        Task: For each candidate, write a 2-sentence explanation of why they fit.
-        OUTPUT: Return EXACTLY a JSON array of strings. No markdown.`;
+        profile = myJobs.find(j => j.id === selectedJob) || myJobs[0];
+        items = workers;
       } else {
-        const workerProfile = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        prompt = `You are the AI matching engine for QuickRozgar.
-        Worker Profile: Name: ${workerProfile.data.full_name}, Skills: ${workerProfile.data.skills}, Location: ${workerProfile.data.location}.
-        Available Jobs: ${openJobs.map((j, i) => `${i}: ${j.title} at ${j.company}, Location: ${j.location}`).join('\n')}
-        Task: For each job, write a 2-sentence explanation of why it fits this worker.
-        OUTPUT: Return EXACTLY a JSON array of strings. No markdown.`;
+        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        profile = data;
+        items = openJobs;
       }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      const insights = await getAIMatches({
+        role: role!,
+        profile,
+        items
       });
-
-      const data = await response.json();
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
-      const cleanText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-      const insights = JSON.parse(cleanText);
       
-      setAiInsights(insights);
+      // Merge insights with full item data
+      const merged = insights.map((insightObj: any) => {
+        const fullItem = items.find(i => i.id === insightObj.id);
+        return fullItem ? { ...fullItem, insight: insightObj.insight } : null;
+      }).filter(Boolean);
+
+      setFinalResults(merged);
       setHasScanned(true);
     } catch (error) {
       console.error("AI Matching Error:", error);
       toast.error("AI analysis encountered an issue, using smart defaults.");
       const list = role === 'employer' ? workers : openJobs;
-      setAiInsights(list.map(() => "Great match based on location and skill overlap. Highly recommended for this role."));
+      setFinalResults(list.slice(0, 3).map(item => ({ 
+        ...item, 
+        insight: "Strong match based on location and skill overlap. Highly recommended for this role." 
+      })));
       setHasScanned(true);
     } finally {
       setIsScanning(false);
       toast.success("AI Analysis Complete!");
     }
   };
+
 
   const inviteOrApply = async (id: string, name: string) => {
     setInvitingId(id);
@@ -166,7 +166,7 @@ function AIMatchingPage() {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {hasScanned ? (
-            resultsList.map((item, idx) => (
+            finalResults.map((item) => (
               <div key={item.id} className="group relative rounded-[2rem] border border-border bg-surface/80 backdrop-blur p-8 shadow-soft hover:shadow-card transition-all hover:-translate-y-1">
                 <div className="flex justify-between items-start mb-6">
                   <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/60 text-white text-2xl font-bold shadow-soft">
@@ -191,7 +191,7 @@ function AIMatchingPage() {
                     <BrainCircuit className="h-3 w-3" /> Gemini Insight
                   </div>
                   <p className="text-xs text-blue-900 leading-relaxed font-medium italic">
-                    "{aiInsights[idx] || 'Verified high-overlap match based on hyperlocal data.'}"
+                    "{item.insight || 'Verified high-overlap match based on hyperlocal data.'}"
                   </p>
                 </div>
 

@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { extractJobDetails, getEmployerTips, getAIMatches } from "@/lib/api.server";
 import {
   Plus,
   TrendingUp,
@@ -47,6 +48,11 @@ function DashboardPage() {
   const [payUnit, setPayUnit] = useState("shift");
   const [location, setLocation] = useState("");
   const [shift, setShift] = useState("");
+
+  // AI Posting State
+  const [aiDescription, setAiDescription] = useState("");
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [aiTips, setAiTips] = useState<any[]>([]);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
@@ -108,6 +114,49 @@ function DashboardPage() {
     },
   });
 
+  const activeJobs = useMemo(() => jobs.filter((j: any) => j.status === "open"), [jobs]);
+  const closedJobs = useMemo(() => jobs.filter((j: any) => j.status === "closed"), [jobs]);
+
+  // Fetch AI Tips & Matches when data is ready
+  const [candidateMatches, setCandidateMatches] = useState<any[]>([]);
+  const [isLoadingMatches, setIsLoadingMatches] = useState(false);
+
+  useEffect(() => {
+    if (jobs.length > 0 || applications.length > 0) {
+      getEmployerTips({ jobs, apps: applications })
+        .then(setAiTips)
+        .catch(console.error);
+    }
+  }, [jobs.length, applications.length]);
+
+  useEffect(() => {
+    async function fetchMatches() {
+      if (activeJobs.length > 0) {
+        setIsLoadingMatches(true);
+        try {
+          const { data: workers } = await supabase.from('profiles').select('*').eq('role', 'worker').limit(10);
+          if (workers && workers.length > 0) {
+            const insights = await getAIMatches({
+              role: 'employer',
+              profile: activeJobs[0],
+              items: workers
+            });
+            const merged = insights.map((insightObj: any) => {
+              const fullItem = workers.find(i => i.id === insightObj.id);
+              return fullItem ? { ...fullItem, insight: insightObj.insight } : null;
+            }).filter(Boolean);
+            setCandidateMatches(merged.slice(0, 3));
+          }
+        } catch (error) {
+          console.error("Dashboard matching error:", error);
+        } finally {
+          setIsLoadingMatches(false);
+        }
+      }
+    }
+    fetchMatches();
+  }, [activeJobs.length]);
+
   const updateApplicationStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string, status: 'accepted' | 'rejected' }) => {
       const { error } = await supabase
@@ -126,8 +175,6 @@ function DashboardPage() {
     }
   });
 
-  const activeJobs = useMemo(() => jobs.filter((j: any) => j.status === "open"), [jobs]);
-  const closedJobs = useMemo(() => jobs.filter((j: any) => j.status === "closed"), [jobs]);
 
   const createJob = useMutation({
     mutationFn: async () => {
@@ -160,6 +207,27 @@ function DashboardPage() {
       toast.error(err.message || "Failed to publish job");
     },
   });
+
+  const handleAIExtraction = async () => {
+    if (!aiDescription.trim()) return toast.error("Please describe the job first!");
+    
+    setIsExtracting(true);
+    try {
+      const details = await extractJobDetails({ description: aiDescription });
+      
+      if (details.role) setTitle(details.role);
+      if (details.pay) setPay(Number(details.pay.replace(/[^0-9]/g, '')) || 600);
+      if (details.location) setLocation(details.location);
+      if (details.shift) setShift(details.shift);
+      
+      toast.success("AI magic applied! Check the details below.");
+    } catch (error) {
+      console.error("AI Extraction Error:", error);
+      toast.error("AI could not extract details. Please fill manually.");
+    } finally {
+      setIsExtracting(false);
+    }
+  };
 
   const updateJobStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string, status: string }) => {
@@ -369,11 +437,36 @@ function DashboardPage() {
                   Describe the role and we'll match in minutes.
                 </p>
               </div>
-              <span className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary">
-                AI assisted
+              <span className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary flex items-center gap-1">
+                <Sparkles className="h-3 w-3" /> AI Powered
               </span>
             </div>
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
+
+            <div className="mt-5 space-y-4">
+              <div className="relative">
+                <textarea
+                  placeholder="Describe your job in natural language... (e.g. 'Need a delivery rider for Koramangala, 6-11 PM, 500 per shift')"
+                  value={aiDescription}
+                  onChange={(e) => setAiDescription(e.target.value)}
+                  className="w-full min-h-[100px] rounded-2xl border border-primary/20 bg-primary/5 p-4 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-none"
+                />
+                <button
+                  onClick={handleAIExtraction}
+                  disabled={isExtracting || !aiDescription.trim()}
+                  className="absolute bottom-4 right-4 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-white shadow-glow hover:scale-105 disabled:opacity-50 transition-all flex items-center gap-2"
+                >
+                  {isExtracting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                  {isExtracting ? "Extracting..." : "Magic Extract"}
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 py-2">
+                <div className="h-px flex-1 bg-border" />
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Or fill manually</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
               <input
                 placeholder="Role title — e.g. Evening Server"
                 value={title}
@@ -436,6 +529,7 @@ function DashboardPage() {
               </button>
             </div>
           </div>
+        </div>
 
           {/* Active listings */}
           <div className="rounded-2xl border border-border bg-surface shadow-soft">
@@ -512,18 +606,31 @@ function DashboardPage() {
               <h3 className="text-base font-semibold text-secondary">AI Recommendations</h3>
             </div>
             <ul className="mt-5 space-y-4 text-sm">
-              <li className="rounded-xl bg-muted/60 p-4">
-                <div className="font-medium text-secondary">Boost your visibility</div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Complete your business profile to get 2× more applicants.
-                </p>
-              </li>
-              <li className="rounded-xl bg-muted/60 p-4">
-                <div className="font-medium text-secondary">n8n Workflow suggestion</div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Connect your n8n webhook to get WhatsApp alerts for new applications.
-                </p>
-              </li>
+              {aiTips.length > 0 ? (
+                aiTips.map((tip, i) => (
+                  <li key={i} className="rounded-xl bg-muted/60 p-4 border border-primary/5">
+                    <div className="font-medium text-secondary">{tip.title}</div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {tip.description}
+                    </p>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li className="rounded-xl bg-muted/60 p-4">
+                    <div className="font-medium text-secondary">Boost your visibility</div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Complete your business profile to get 2× more applicants.
+                    </p>
+                  </li>
+                  <li className="rounded-xl bg-muted/60 p-4">
+                    <div className="font-medium text-secondary">n8n Workflow suggestion</div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Connect your n8n webhook to get WhatsApp alerts for new applications.
+                    </p>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 
@@ -538,25 +645,35 @@ function DashboardPage() {
                 Map view <ArrowUpRight className="h-3 w-3" />
               </Link>
             </div>
-            <ul className="mt-4 space-y-3">
-              {[
-                { n: "Sana R.", s: "Server · 0.3 km", r: 4.9 },
-                { n: "Vikram T.", s: "Rider · 0.6 km", r: 4.8 },
-                { n: "Neha P.", s: "Cashier · 0.9 km", r: 4.7 },
-              ].map((w) => (
-                <li key={w.n} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-8 w-8 place-items-center rounded-full bg-muted text-xs font-semibold text-secondary">
-                      {w.n[0]}
+            <ul className="mt-4 space-y-4">
+              {isLoadingMatches ? (
+                <div className="py-8 text-center text-xs text-muted-foreground animate-pulse">Gemini is finding the best talent...</div>
+              ) : candidateMatches.length > 0 ? (
+                candidateMatches.map((w) => (
+                  <li key={w.id} className="group flex flex-col gap-2 rounded-2xl border border-border bg-background/50 p-4 hover:border-primary/30 transition-all">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary/60 text-xs font-bold text-white shadow-soft">
+                          {w.full_name?.[0] || 'W'}
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-secondary">{w.full_name}</div>
+                          <div className="text-[10px] text-muted-foreground font-medium">{w.skills} · {w.location}</div>
+                        </div>
+                      </div>
+                      <div className="text-[10px] font-bold text-success bg-success/10 px-2 py-0.5 rounded-full">MATCH</div>
                     </div>
-                    <div>
-                      <div className="text-sm font-medium text-secondary">{w.n}</div>
-                      <div className="text-xs text-muted-foreground">{w.s}</div>
-                    </div>
-                  </div>
-                  <div className="text-xs font-semibold text-secondary">{w.r}★</div>
-                </li>
-              ))}
+                    <p className="text-[10px] text-muted-foreground leading-relaxed italic border-l-2 border-primary/20 pl-2 mt-1">
+                      "{w.insight}"
+                    </p>
+                    <button className="mt-2 w-full rounded-xl bg-secondary/10 py-1.5 text-[10px] font-bold text-secondary hover:bg-secondary hover:text-white transition-all">
+                      Invite to apply
+                    </button>
+                  </li>
+                ))
+              ) : (
+                <div className="py-8 text-center text-xs text-muted-foreground">No matches found. Post a job to start matching!</div>
+              )}
             </ul>
           </div>
         </div>

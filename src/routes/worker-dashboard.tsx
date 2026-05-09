@@ -3,7 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
-import { Briefcase, MapPin, IndianRupee, Clock, CheckCircle2, XCircle, Search, Loader2, Star, Target, Check, X, ShieldCheck, Sparkles } from "lucide-react";
+import { Briefcase, MapPin, IndianRupee, Clock, CheckCircle2, XCircle, Search, Loader2, Star, Target, Check, X, ShieldCheck, Sparkles, Zap } from "lucide-react";
+import { getWorkerSmartMatches } from "@/lib/api.server";
+
 
 export const Route = createFileRoute("/worker-dashboard")({
   component: WorkerDashboard,
@@ -258,17 +260,16 @@ function WorkerDashboard() {
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
 }
 
 function WorkerAIMatches({ workerProfile }: { workerProfile: any }) {
   const queryClient = useQueryClient();
   const [matches, setMatches] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "AIzaSyDZhYFJOc4hNIWOG3sz18mILjWORMVh8lY";
   
   useEffect(() => {
     async function getMatches() {
@@ -287,31 +288,8 @@ function WorkerAIMatches({ workerProfile }: { workerProfile: any }) {
           return;
         }
 
-        // 2. Ask Gemini to find the best match
-        const prompt = `You are an AI career coach for QuickRozgar.
-        Worker Profile: Name: ${workerProfile.full_name}, Skills: ${workerProfile.skills}, Location: ${workerProfile.location}.
-        
-        Available Jobs:
-        ${jobs.map((j, i) => `${i}: Title: ${j.title}, Company: ${j.company}, Pay: ${j.pay}, Skills Required: ${j.category}`).join('\n')}
-        
-        Task: Pick the top 2 jobs that best fit this worker. For each, write a 1-sentence "Why this fits" insight.
-        Return ONLY a JSON array of objects: [{"jobIndex": number, "insight": string}]. No markdown.`;
-
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-        });
-
-        const data = await response.json();
-        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
-        const cleanText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-        const aiMatches = JSON.parse(cleanText);
-
-        const result = aiMatches.map((m: any) => ({
-          ...jobs[m.jobIndex],
-          insight: m.insight
-        }));
+        // 2. Ask Gemini to find the best match via server function
+        const result = await getWorkerSmartMatches({ workerProfile, jobs });
 
         setMatches(result);
       } catch (err) {
@@ -327,6 +305,7 @@ function WorkerAIMatches({ workerProfile }: { workerProfile: any }) {
     }
     getMatches();
   }, [workerProfile]);
+
 
   const applyMutation = useMutation({
     mutationFn: async (jobId: string) => {
